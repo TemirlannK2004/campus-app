@@ -33,14 +33,14 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     objects=CustomUserManager()
 
-    def __str__(self):
+    def __str__(self: str)-> str:
         return self.email
     
     @property
-    def full_name(self):
+    def full_name(self: str)-> str:
         return f'{self.first_name} {self.last_name}'
     
-    def tokens(self):
+    def tokens(self: str)-> str:
         refresh = RefreshToken.for_user(self)
         return ({
                 'refresh':str((refresh)),
@@ -53,6 +53,6 @@ class OneTimePasswordUser(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     code = models.CharField(max_length=6,unique=True)
 
-    def __str__(self):
+    def __str__(self: str)-> str:
         return self.user.first_name % 'passcode'
     
