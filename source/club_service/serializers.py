@@ -32,11 +32,26 @@ class ClubSerializer(serializers.ModelSerializer):
     club_member_count = serializers.IntegerField(read_only=True)
     club_staff_count = serializers.IntegerField(read_only=True)
     staff = ClubStaffSerializer(source='clubstaff_set',many=True)
-    head = ClubHeadSerializer(source='clubhead_set', many=True, read_only=True)
+    head = ClubHeadSerializer(source='clubhead_set', many=True, read_only=True) 
     class Meta:
         model = models.Club
         fields = ('club_name', 'description', 'club_logo', 'slug', 'is_active','club_member_count','club_staff_count','staff','head')
         lookup_field = 'slug'
+
+
+
+
+class AllClubsSerializer(serializers.ModelSerializer):
+    club_head_full_name = serializers.SerializerMethodField()
+    class Meta:
+        model = models.Club
+        fields = ['id','club_name','description','club_head_full_name']
+
+    def get_club_head_full_name(self, obj):
+        if obj.club_head:
+            return f'{obj.club_head.first_name} {obj.club_head.last_name}' 
+        return None
+
 
 
 
