@@ -9,8 +9,7 @@ router.register(r'clubs',views.ClubViewSet,basename='clubs')
 router.register(r'club-posts', views.ClubPostViewSet, basename='club-post')
 
 urlpatterns = [
-    # path('clubs/',views.ClubsListView.as_view(),name = 'clubs-list'),
-    # path('clubs/<slug:slug>/',views.ClubDetailsView.as_view(),name='club-details'),
+    path('clubs/<slug:slug>/news/',views.ClubNewsAPI.as_view(),name='club-news'),
     path('',include(router.urls)),
 
 ]

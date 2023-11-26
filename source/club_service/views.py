@@ -1,21 +1,17 @@
-from django.http import HttpResponse
-from django.shortcuts import render
 from rest_framework import generics
-from rest_framework.permissions import IsAdminUser,SAFE_METHODS,BasePermission
-from rest_framework import viewsets
+from rest_framework import permissions 
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from source.club_service import models
-from source.club_service.serializers import ClubSerializer,ClubPostSerializer
+from source.club_service.serializers import ClubSerializer,ClubPostSerializer,ClubNewsSerializer
 from django.db.models import Q,Case,Count,F,Value,IntegerField,Prefetch
 from rest_framework.decorators import action
-from django.core.cache import cache
-import time
-import redis
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-redis_instance = redis.StrictRedis(host='127.0.0.1', port=6379, db=1)
-# from rest_framework.decorators import api_view
-# # Create your views here.
+from rest_framework import viewsets
+from rest_framework import serializers
+from rest_framework import status
+
 
 
 
@@ -30,16 +26,31 @@ redis_instance = redis.StrictRedis(host='127.0.0.1', port=6379, db=1)
 #         return Response(serializer.data)
 
 
+class ClubNewsAPI(generics.ListCreateAPIView):
+    serializer_class = ClubNewsSerializer
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        club = get_object_or_404(models.Club, slug=slug)
+        
+        return models.ClubNews.objects.filter(club=club).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        slug = self.kwargs.get('slug')
+        club = get_object_or_404(models.Club, slug=slug)
+        serializer.save(club=club)
 
 
 
 
-class ReadOnly(BasePermission):
+
+
+class ReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.method in SAFE_METHODS
+        return request.method in permissions.SAFE_METHODS
     
 class ClubViewSet(viewsets.ReadOnlyModelViewSet ):
-    permission_classes = [ReadOnly | IsAdminUser,]
+    permission_classes = [ReadOnly | permissions.IsAdminUser,]
     serializer_class = ClubSerializer
     lookup_field = 'slug'
     def get_queryset(self):
@@ -51,7 +62,7 @@ class ClubViewSet(viewsets.ReadOnlyModelViewSet ):
         return models.Club.objects.filter(slug=slug).annotate(
             club_member_count = Count('members',distinct=True),club_staff_count = Count('staff',distinct=True)
             ).prefetch_related(
-                Prefetch('staff',models.User.objects.only('first_name','last_name'))
+                Prefetch('staff'    ,models.User.objects.only('first_name','last_name'))
             )
 
 

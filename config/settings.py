@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'source.auth_service',
     'source.club_service',
     'source.user_service',
+    'source.announcements_service',
 
 ]
 

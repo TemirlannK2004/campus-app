@@ -7,6 +7,18 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['first_name','last_name']
 
 
+
+class ClubNewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ClubNews
+        fields = [
+            'id',
+            'title',
+            'content',
+            'created_at'
+        ]
+
+
 class ClubHeadSerializer(serializers.ModelSerializer):
     club_head = UserSerializer()
     club = serializers.SerializerMethodField()

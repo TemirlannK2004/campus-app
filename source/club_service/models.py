@@ -73,7 +73,7 @@ class ClubNews(models.Model):
 
     def __str__(self: str) -> str:
         return self.title    
-    
+        
 
 class ClubPost(models.Model):
     club = models.ForeignKey(Club, on_delete=models.CASCADE, related_name='posts')
