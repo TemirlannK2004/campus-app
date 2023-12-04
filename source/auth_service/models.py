@@ -21,16 +21,14 @@ class User(AbstractBaseUser,PermissionsMixin):
     last_login = models.DateTimeField(auto_now=True)
 
     avatar = models.ImageField(
-        upload_to='',
+        upload_to='user_avatars/',
         blank=True,
         null=True,
         validators=[validators.FileExtensionValidator(allowed_extensions=['png','jpg','jpeg']),validate_size_image]
     )
 
     USERNAME_FIELD= 'email'
-    
     REQUIRED_FIELDS=['first_name','last_name'] 
-
     objects=CustomUserManager()
 
     def __str__(self: str)-> str:

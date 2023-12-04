@@ -15,7 +15,7 @@ SECRET_KEY = "django-insecure-^4*ph^(yi#4j-q5*g@=yb&kfl)ec465=##m0etn16v!!h9)*w)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -31,12 +31,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     "debug_toolbar",
+    'django_celery_beat',
+    'corsheaders',
 
 
     'source.auth_service',
     'source.club_service',
     'source.user_service',
     'source.announcements_service',
+    'source.trading_service',
 
 ]
 
@@ -49,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -202,3 +206,40 @@ EMAIL_HOST_PASSWORD = '88073c3d95650c'
 DEFAULT_FROM_EMAIL = 'info@rest.com'
 EMAIL_PORT = '2525'
 EMAIL_USE_TLS=True
+
+
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # URL вашего брокера сообщений (например, Redis)
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # URL вашего брокера сообщений (например, Redis)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# Настройки Celery Beat
+CELERY_BEAT_SCHEDULE = {
+    'delete-old-posts': {
+        'task': 'your_app.tasks.delete_old_posts',
+        'schedule': timedelta(days=1),  # Запускать каждый день
+    },
+}
+
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+SWAGGER_SETTINGS = {
+    'DEFAULT_FIELD_INSPECTORS': [
+        'drf_yasg.inspectors.CamelCaseJSONFilter',
+        'drf_yasg.inspectors.InlineSerializerInspector',
+        'drf_yasg.inspectors.RelatedFieldInspector',
+        'drf_yasg.inspectors.ChoiceFieldInspector',
+        'drf_yasg.inspectors.FileFieldInspector',
+        'drf_yasg.inspectors.DictFieldInspector',
+        'drf_yasg.inspectors.SimpleFieldInspector',
+        'drf_yasg.inspectors.StringDefaultFieldInspector',
+    ],
+}

@@ -6,10 +6,10 @@ from rest_framework.routers import DefaultRouter,SimpleRouter
 
 router = DefaultRouter()
 router.register(r'clubs',views.ClubViewSet,basename='clubs')
-router.register(r'club-posts', views.ClubPostViewSet, basename='club-post')
 
 urlpatterns = [
     path('clubs/<slug:slug>/news/',views.ClubNewsAPI.as_view(),name='club-news'),
+    path('clubs/<slug:slug>/posts/',views.ClubPostsAPIView.as_view(),name='club-posts'),
     path('',include(router.urls)),
 
 ]

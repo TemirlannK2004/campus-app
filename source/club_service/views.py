@@ -27,7 +27,11 @@ from rest_framework import status
 
 
 class ClubNewsAPI(generics.ListCreateAPIView):
+    """
+    Returns Club News by slug
+    """
     serializer_class = ClubNewsSerializer
+    permission_classes = permissions.IsAuthenticatedOrReadOnly
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
@@ -66,20 +70,11 @@ class ClubViewSet(viewsets.ReadOnlyModelViewSet ):
             )
 
 
-class ClubPostViewSet(viewsets.ModelViewSet):
-    queryset = models.ClubPost.objects.all()
-    serializer_class = ClubPostSerializer
+class ClubPostsAPIView(APIView):
+    permission_classes = permissions.IsAuthenticatedOrReadOnly
 
-    @action(detail=True, methods=['post'])
-    def like(self, request, pk=None):
-        post = self.get_object()
-        user = request.user
-
-        if user in post.likes.all():
-            post.likes.remove(user)
-        else:
-            post.likes.add(user)
-
-        post.save()
-        serializer = ClubPostSerializer(post)
+    def get(self, request, slug):
+        club = get_object_or_404(models.Club, slug=slug)
+        club_posts = models.ClubPost.objects.filter(club=club).order_by('-created_at')
+        serializer = ClubPostSerializer(club_posts, many=True)
         return Response(serializer.data)
